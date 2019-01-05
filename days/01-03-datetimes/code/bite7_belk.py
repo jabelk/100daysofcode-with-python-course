@@ -16,10 +16,16 @@ from datetime import datetime
 import os
 import urllib.request
 
+SHUTDOWN_EVENT = 'Shutdown initiated'
 
-#print(loglines)
+# prep: read in the logfile
+logfile = os.path.join('/tmp', 'log')
+urllib.request.urlretrieve('http://bit.ly/2AKSIbf', logfile)
 
-# for you to code:
+with open(logfile) as f:
+    loglines = f.readlines()
+print(loglines)
+
 
 
 def convert_to_datetime(line):
@@ -48,7 +54,19 @@ def time_between_shutdowns(loglines):
        Extract shutdown events ("Shutdown initiated") from loglines and calculate the
        timedelta between the first and last one.
        Return this datetime.timedelta object.'''
-    pass
+    loglines = ['INFO 2014-07-03T23:27:51 supybot Shutdown initiated.\n', 'INFO 2014-07-03T23:27:51 supybot Killing Driver objects.\n', 'INFO 2014-07-03T23:27:51 supybot Killing Irc objects.\n', 'INFO 2014-07-03T23:27:51 supybot Shutdown complete.\n', 'INFO 2014-07-03T23:30:37 supybot Creating new Irc for freenode.\n', 'INFO 2014-07-03T23:30:37 supybot Connecting to irc.freenode.net:8001.\n', 'INFO 2014-07-03T23:30:38 supybot Loading plugins (connecting to freenode).\n', 'INFO 2014-07-03T23:30:46 supybot Server orwell.freenode.net has version ircd-seven-1.1.3\n', 'INFO 2014-07-03T23:30:48 supybot Got end of MOTD from orwell.freenode.net\n', 'INFO 2014-07-03T23:30:54 supybot Join to #timvideos on freenode synced in 2.41 seconds.\n', "INFO 2014-07-03T23:31:22 supybot Exiting due to Ctrl-C.  If the bot doesn't exit within a few seconds, feel free to press Ctrl-C again to make it exit without flushing its message queues.\n", 'INFO 2014-07-03T23:31:22 supybot Flushers flushed and garbage collected.\n', 'INFO 2014-07-03T23:31:22 supybot Driver for Irc object for freenode dying.\n', 'INFO 2014-07-03T23:31:22 supybot Irc object for freenode dying.\n', 'INFO 2014-07-03T23:31:22 supybot Driver for Irc object for freenode dying.\n', 'WARNING 2014-07-03T23:31:22 supybot Disconnect from irc.freenode.net:8001: error: [Errno 9] Bad file descriptor.\n', 'INFO 2014-07-03T23:31:22 supybot Reconnecting to freenode at 2014-07-03T23:31:32.\n', 'INFO 2014-07-03T23:31:22 supybot Removing driver SocketDriver(Irc object for freenode).\n', 'INFO 2014-07-03T23:31:22 supybot Total uptime: 45 seconds.\n', 'INFO 2014-07-03T23:31:22 supybot Total CPU time taken: 1.12 seconds.\n', 'INFO 2014-07-03T23:31:22 supybot No more Irc objects, exiting.\n', 'INFO 2014-07-03T23:31:22 supybot Shutdown initiated.\n', 'INFO 2014-07-03T23:31:22 supybot Killing Driver objects.\n', 'INFO 2014-07-03T23:31:22 supybot Killing Irc objects.\n', 'INFO 2014-07-03T23:31:22 supybot Writing registry file to planet-news.conf\n', 'INFO 2014-07-03T23:31:22 supybot Finished writing registry file.\n', 'INFO 2014-07-03T23:31:22 supybot Shutdown complete.\n']
+
+    shut_events = []
+    for line in loglines:
+        if "Shutdown initiated." in line:
+            shut_events.append([line, convert_to_datetime(line)])
+
+    if shut_events:
+        print(shut_events[0][1], shut_events[-1][1])
+        first_last_delta =  shut_events[-1][1] - shut_events[0][1]
+        return first_last_delta
+
+    return shut_events
 
 
 if __name__ == "__main__":
@@ -60,7 +78,8 @@ if __name__ == "__main__":
 
     with open(logfile) as f:
         loglines = f.readlines()
-
+    print(loglines)
     line = 'ERROR 2014-07-03T23:24:31 supybot Invalid user dictionary file, resetting to empty.\n'
 
-    print (convert_to_datetime(line))
+    print(convert_to_datetime(line))
+    print(time_between_shutdowns(loglines))
